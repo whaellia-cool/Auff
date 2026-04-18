@@ -15,6 +15,7 @@ use tui_input::{backend::crossterm::EventHandler, Input};
 enum MediaType {
     Movie,
     Book,
+    Game,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -133,6 +134,10 @@ fn main() -> Result<()> {
                         app.active_type = MediaType::Book;
                         app.input_mode = true;
                     }
+                    (KeyCode::Char('g'), _) => {
+                        app.active_type = MediaType::Game;
+                        app.input_mode = true;
+                    }
                     (KeyCode::Char('x') | KeyCode::Delete, _) => app.delete_entry(),
                     (KeyCode::Right, _) => { let _ = app.table_state.select_next_column(); }
                     (KeyCode::Left, _)  => { let _ = app.table_state.select_previous_column(); }
@@ -174,7 +179,8 @@ fn ui(frame: &mut Frame, app: &mut App) {
                     if let Some((kind, title)) = &entry.content {
                         let color = match kind {
                             MediaType::Movie => Color::Magenta,
-                            MediaType::Book  => Color::Green,
+                            MediaType::Book  => Color::Rgb(20, 180, 100),
+                            MediaType::Game  => Color::Rgb(220, 180, 20),
                         };
 
                         let is_selected = app.table_state.selected() == Some(day as usize - 1) 
@@ -220,14 +226,19 @@ fn ui(frame: &mut Frame, app: &mut App) {
 
     frame.render_stateful_widget(table, chunks[0], &mut app.table_state);
 
-    let help_text = " M: Movie | B: Book | X: Delete | Tab: Year | Q: Quit ";
+    let help_text = " M: Movie | B: Book | G: Game | X: Delete | Tab: Year | Q: Quit ";
     let help_bar = Paragraph::new(help_text)
         .style(Style::default().fg(Color::Blue))
         .alignment(Alignment::Center);
     frame.render_widget(help_bar, chunks[1]);
 
     if app.input_mode {
-        let title = format!(" Add {} ", if app.active_type == MediaType::Movie { "Movie" } else { "Book" });
+        let type_str = match app.active_type {
+            MediaType::Movie => "Movie",
+            MediaType::Book  => "Book",
+            MediaType::Game  => "Game",
+        };
+        let title = format!(" Add {} ", type_str);
         render_popup(frame, title, app.input.value(), Color::Cyan, 3);
     }
 }
