@@ -239,12 +239,12 @@ fn ui(frame: &mut Frame, app: &mut App) {
             MediaType::Game  => "Game",
         };
         let title = format!(" Add {} ", type_str);
-        render_popup(frame, title, app.input.value(), Color::Cyan, 3);
+        render_popup(frame, title, app.input.value(), Color::Cyan, 1);
     }
 }
 
 fn render_popup(frame: &mut Frame, title: String, content: &str, color: Color, h: u16) {
-    let area = centered_rect(50, h * 10, frame.area());
+    let area = centered_rect(30, h * 10, frame.area());
     frame.render_widget(Clear, area);
     frame.render_widget(
         Paragraph::new(content)
